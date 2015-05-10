@@ -5,7 +5,7 @@
 1. [Overview](#overview)
 2. [In a Nutshell](#Nutshell)
 3. [Usage - How to Start](#usage)
-    * [Install Vagrant](#install-vanapi)
+    * [Install API Client](#install-api-tools)
     * [Exporting Data](#exporting-data)
     * [Checking Data](#checking-data)
     * [Importing Data](#importing-data)
