@@ -49,9 +49,6 @@ apiid = os.environ["APIID"]
 credentials = van_api.ClientCredentialsGrant(apikey, apisecret)
 api = van_api.API('api.metropublisher.com', credentials)
 
-""" Generate Unique UUID for the import"""
-content_upload_uuid = uuid.uuid1()
-
 csvFile = csv.reader(open(importfile, "rb"), doublequote='false')
 for row in csvFile:
 
@@ -65,6 +62,7 @@ for row in csvFile:
         createdate  = row[7]
 
         logging.info("Sending Article - %s" % (title)) 
+        content_upload_uuid = uuid.uuid1()
         logging.info("  --- Submiting with uuid of %s" % (content_upload_uuid))
         result = api.PUT('/%s/content/%s' % (apiid, content_upload_uuid),
                         {"urlname": "%s" % (urlname),
