@@ -220,16 +220,17 @@ To run this script you will need to setup environment variables
     export APISECRET=YOUR_API_KEY
     export APIID=YOUR_API_SITE_ID
 ```
-Then pass it your csv file name.
+Then pass it your csv file name and the file to catch the exceptions
 ```
-./put_article.py exported.csv
+./put_article.py exported.csv invalidrecords.csv
 ```
-This either works or spits
+This either will interate all of the records and create a file of the 
+failed transations called `invalidrecords.csv` for you to clean up and
+then try again.  Failures appear to happen in the content field 
 ```
 van_api.APIError: bad_parameters: One or more of your incoming parameters failed validation, see info for details
 {u'content': u'Invalid value'
 ```
-This means you've violated the validation rules in your `content` field.
 
 ## Limitations
 

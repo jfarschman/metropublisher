@@ -38,6 +38,7 @@ import van_api
 
 """ Import the working file """
 importfile = str(sys.argv[1])
+outputfile = str(sys.argv[2])
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(message)s')
 
@@ -49,7 +50,9 @@ apiid = os.environ["APIID"]
 credentials = van_api.ClientCredentialsGrant(apikey, apisecret)
 api = van_api.API('api.metropublisher.com', credentials)
 
+broken = csv.writer(open(outputfile, "wb"), doublequote='true', delimiter=',')
 csvFile = csv.reader(open(importfile, "rb"), doublequote='false')
+
 for row in csvFile:
 
         title       = row[0]
@@ -62,27 +65,32 @@ for row in csvFile:
         createdate  = row[7]
 
         logging.info("Sending Article - %s" % (title)) 
-        content_upload_uuid = uuid.uuid1()
-        logging.info("  --- Submiting with uuid of %s" % (content_upload_uuid))
-        result = api.PUT('/%s/content/%s' % (apiid, content_upload_uuid),
-                        {"urlname": "%s" % (urlname),
-                                "content_type": "article",
-                                "created": "%s" % (createdate),
-                                "issued": "%s" % (createdate),
-                                "title": "%s" % (title),
-                                "state": "published",
-                                "description": "%s" % (description),
-                                "content": "%s" % (fulltext),
-                                "section_uuid": "%s" % (section)})
-        logging.info("  --- Applying %s to %s " % (tagid, content_upload_uuid))
-        time.sleep(1)
-        result = api.PUT('/%s/tags/%s/describes/%s' % (apiid, tagid, content_upload_uuid),
-                        {"created": "%s" % (createdate)})
-        logging.info("  --- Setting %s as author of %s " % (authorid, content_upload_uuid))
-        time.sleep(1)
-        result = api.PUT('/%s/tags/%s/authored/%s' % (apiid, authorid, content_upload_uuid),
-                        {"created": "%s" % (createdate)})
+        try:
+           content_upload_uuid = uuid.uuid1()
+           logging.info("  --- Submiting with uuid of %s" % (content_upload_uuid))
+           result = api.PUT('/%s/content/%s' % (apiid, content_upload_uuid),
+                           {"urlname": "%s" % (urlname),
+                                   "content_type": "article",
+                                   "created": "%s" % (createdate),
+                                   "issued": "%s" % (createdate),
+                                   "title": "%s" % (title),
+                                   "state": "published",
+                                   "description": "%s" % (description),
+                                   "content": "%s" % (fulltext),
+                                   "section_uuid": "%s" % (section)})
+           logging.info("  --- Applying %s to %s " % (tagid, content_upload_uuid))
+           time.sleep(1)
+           result = api.PUT('/%s/tags/%s/describes/%s' % (apiid, tagid, content_upload_uuid),
+                           {"created": "%s" % (createdate)})
+           logging.info("  --- Setting %s as author of %s " % (authorid, content_upload_uuid))
+           time.sleep(1)
+           result = api.PUT('/%s/tags/%s/authored/%s' % (apiid, authorid, content_upload_uuid),
+                           {"created": "%s" % (createdate)})
+        except van_api.APIError, e:
+                print "Error %s:" % (e.args[0])
+                broken.writerow(row)
+                pass
         time.sleep(1)
         logging.info("Completed article - %s" % (title))
-
+broken.close()
 logging.info("FINISHED THE ENTIRE RUN")
