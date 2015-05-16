@@ -41,4 +41,8 @@ for row in csvFile:
         fulltext    = row[6]
         createdate  = row[7]
 
-        print(createdate)
+        try:
+           print(createdate)
+        except IndexError, e:
+           print "Error %s:" % (e.args[0])
+           pass
